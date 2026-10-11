@@ -132,6 +132,13 @@ export function Settings() {
         <Toggle label="Auto-start focus after breaks" k="autoStartFocus" />
         <Toggle label="Open focus view on start" k="autoFocusView" />
         <Toggle label="Week starts Monday" k="weekStartsMonday" />
+        {isDesktop && (
+          <Toggle
+            label="Keep running in the tray when closed"
+            k="closeToTray"
+            hint={`Timers, the floating widget and the local API keep going. Quit from the tray icon. Off: closing the window quits ${APP_NAME}.`}
+          />
+        )}
         {(isDesktop || canPopOut) && (
           <label className="field">
             <span>

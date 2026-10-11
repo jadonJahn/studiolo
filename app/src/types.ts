@@ -83,6 +83,8 @@ export interface Settings {
   widgetClock: boolean;
   /** Desktop: serve a read-only HTTP API of your data on 127.0.0.1. */
   localApi: boolean;
+  /** Desktop: closing the window keeps the app running in the tray instead of quitting. */
+  closeToTray: boolean;
   /** First-run welcome has been seen. */
   welcomed: boolean;
 }

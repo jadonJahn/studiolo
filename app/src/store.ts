@@ -54,6 +54,7 @@ export const DEFAULT_SETTINGS: Settings = {
   widgetClock: true,
   localApi: ext.localApiDefault ?? false,
   welcomed: false,
+  closeToTray: false,
 };
 
 export const DEFAULT_ACTIVITIES: Activity[] = [

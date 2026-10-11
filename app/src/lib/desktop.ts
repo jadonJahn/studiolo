@@ -127,9 +127,12 @@ export async function initDesktop(onTick: () => void): Promise<void> {
   pushTimer();
 
   const syncApi = (on: boolean) => setApiEnabled(on).catch((e) => console.warn('API toggle failed', e));
+  const syncTray = (on: boolean) => invoke!('set_close_to_tray', { on }).catch((e) => console.warn('Tray setting failed', e));
   void syncApi(useStore.getState().settings.localApi);
+  void syncTray(useStore.getState().settings.closeToTray);
   useStore.subscribe((st, prev) => {
     if (st.settings.localApi !== prev.settings.localApi) void syncApi(st.settings.localApi);
+    if (st.settings.closeToTray !== prev.settings.closeToTray) void syncTray(st.settings.closeToTray);
   });
 
   await listen('tick', onTick);

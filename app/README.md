@@ -22,7 +22,7 @@ The desktop shell adds these on top of the web app:
 
 - **SQLite mirror.** All data is mirrored to `%APPDATA%\io.github.jadonjahn.studiolo\flowstate.db`. If the webview's storage is ever wiped, the app restores from this file.
 - **Read-only HTTP API (opt-in).** Turn on *Settings → Data & API → Local data API* to serve your data at `127.0.0.1:47800` (`/api` lists the endpoints) for scripts and automations. It's off by default; while it's on, any program on the PC can read it. To reach it from other machines, put it behind a tunnel such as `tailscale serve`.
-- **Tray.** Closing the window hides it to the tray, so timers and the API keep running. Use the tray menu's Quit to exit.
+- **Tray.** Closing the window quits the app. Turn on *Settings → Timer → Keep running in the tray when closed* to have timers, the widget and the API keep going in the background; then use the tray menu's Quit to exit. Opening the app again while it's running brings the existing window back instead of starting a second copy.
 - **Floating widget.** While a session runs and Studiolo isn't the active window, a small always-on-top timer floats over your other apps: a card with the live art, or a compact bar. It never takes keyboard focus. (In Chromium browsers, focus view has a pop-out button that does the same with Picture-in-Picture.)
 - **Native 1-second heartbeat.** It keeps the timer and chime on time while the window is minimized. WebView2 throttles hidden pages and ignores Tauri's throttling switch on Windows.
 

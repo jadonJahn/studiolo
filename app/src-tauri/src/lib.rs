@@ -9,6 +9,7 @@ mod media;
 use rusqlite::Connection;
 use serde::Serialize;
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use tauri::menu::{Menu, MenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
@@ -25,6 +26,13 @@ struct AppState {
     app_name: String,
     /// The local API runs only while the user has it turned on in Settings.
     api: Mutex<Option<api::Handle>>,
+    /// Closing the main window hides it to the tray instead of quitting (a setting).
+    close_to_tray: AtomicBool,
+}
+
+#[tauri::command]
+fn set_close_to_tray(state: State<AppState>, on: bool) {
+    state.close_to_tray.store(on, Ordering::Relaxed);
 }
 
 #[tauri::command]
@@ -106,6 +114,8 @@ fn show_main(app: &tauri::AppHandle) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // Launching the app again brings the running copy forward instead of starting a second one.
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| show_main(app)))
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_opener::init())
@@ -116,7 +126,7 @@ pub fn run() {
             let conn = Arc::new(Mutex::new(db::open(&db_path)?));
             let now_playing: media::Shared = Arc::new(Mutex::new(None));
             media::spawn_watcher(app.handle().clone(), now_playing.clone());
-            app.manage(AppState { capture: audio::Capture::new(), now_playing, db: conn, data_dir: dir, db_path, app_name: app.package_info().name.clone(), api: Mutex::new(None) });
+            app.manage(AppState { capture: audio::Capture::new(), now_playing, db: conn, data_dir: dir, db_path, app_name: app.package_info().name.clone(), api: Mutex::new(None), close_to_tray: AtomicBool::new(false) });
 
             // WebView2 throttles hidden pages' timers; a native heartbeat keeps the
             // timer's completion check (and chime) on time while minimized or in the tray.
@@ -148,15 +158,22 @@ pub fn run() {
                 .build(app)?;
             Ok(())
         })
-        // Closing the window hides to the tray so timers and the API keep running.
+        // Closing the main window quits, unless the user chose to keep running in the tray
+        // (timers, the floating widget and the API keep going). The widget only ever hides.
         .on_window_event(|window, event| {
             if let WindowEvent::CloseRequested { api, .. } = event {
-                api.prevent_close();
-                let _ = window.hide();
+                let to_tray = window.label() != "main"
+                    || window.try_state::<AppState>().is_some_and(|s| s.close_to_tray.load(Ordering::Relaxed));
+                if to_tray {
+                    api.prevent_close();
+                    let _ = window.hide();
+                } else {
+                    window.app_handle().exit(0);
+                }
             }
         })
         .invoke_handler(tauri::generate_handler![
-            sync_snapshot, sync_timer, load_snapshot, api_info, api_set_enabled, audio_sources, audio_start, audio_stop, now_playing
+            sync_snapshot, sync_timer, load_snapshot, api_info, api_set_enabled, set_close_to_tray, audio_sources, audio_start, audio_stop, now_playing
         ])
         .run(tauri::generate_context!())
         .expect("error while running the app");
