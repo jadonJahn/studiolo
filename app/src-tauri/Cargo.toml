@@ -25,6 +25,9 @@ tauri = { version = "2.12.3", features = ["tray-icon"] }
 rusqlite = { version = "0.40.2", features = ["bundled"] }
 tiny_http = "0.12.0"
 chrono = { version = "0.4.45", default-features = false, features = ["clock"] }
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
+tauri-plugin-opener = "2"
 
 # Music capture (WASAPI) and now-playing (media transport controls).
 [target.'cfg(windows)'.dependencies]

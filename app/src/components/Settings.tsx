@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { ART_STYLES } from '../art/engine';
 import { PALETTES } from '../art/palettes';
-import { APP_NAME } from '../brand';
+import { APP_NAME, APP_VERSION, REPO_URL } from '../brand';
+import { clearErrorLog, diagnostics } from '../lib/diagnostics';
+import { openExternal } from '../lib/links';
+import { canUpdate, checkForUpdate } from '../lib/updates';
 import { ext } from '../extensions';
 import { isDesktop, setApiEnabled, type ApiInfo } from '../lib/desktop';
 import { chime, previewAmbient } from '../lib/sound';
@@ -247,6 +250,8 @@ export function Settings() {
         </div>
       </div>
 
+      <About />
+
       <div className="card glass">
         <h3>Keyboard</h3>
         <ul className="keys">
@@ -320,6 +325,70 @@ function Sharing() {
         )}
       </div>
       {on && tn && <p className="muted small">{tn.note}</p>}
+    </div>
+  );
+}
+
+function About() {
+  const toast = useUI((u) => u.toast);
+  const update = useUI((u) => u.update);
+  const [checking, setChecking] = useState(false);
+  const check = async () => {
+    setChecking(true);
+    try {
+      const u = await checkForUpdate();
+      if (!u) toast({ icon: '✅', title: "You're up to date", body: `${APP_NAME} ${APP_VERSION}` });
+    } catch (e) {
+      toast({ icon: '⚠️', title: "Couldn't check for updates", body: String(e) });
+    } finally {
+      setChecking(false);
+    }
+  };
+  return (
+    <div className="card glass">
+      <h3>
+        About <span className="muted small">{APP_NAME} {APP_VERSION}</span>
+      </h3>
+      <p className="muted small">
+        Found a bug? Copy the diagnostics (version, settings, and recent errors; never your sessions or tasks) and paste them into a
+        new issue.
+      </p>
+      <div className="about-actions">
+        {canUpdate &&
+          (update ? (
+            <button className="btn-primary" onClick={() => void update.install()}>
+              Install {update.version} and restart
+            </button>
+          ) : (
+            <button className="btn-ghost" onClick={() => void check()} disabled={checking}>
+              {checking ? 'Checking…' : 'Check for updates'}
+            </button>
+          ))}
+        <button
+          className="btn-ghost"
+          onClick={() => {
+            void navigator.clipboard.writeText(diagnostics());
+            toast({ icon: '📋', title: 'Diagnostics copied' });
+          }}
+        >
+          Copy diagnostics
+        </button>
+        <button className="btn-ghost" onClick={() => void openExternal(`${REPO_URL}/issues/new/choose`)}>
+          Report a bug
+        </button>
+        <button className="btn-ghost" onClick={() => void openExternal(REPO_URL)}>
+          Source code
+        </button>
+        <button
+          className="btn-ghost"
+          onClick={() => {
+            clearErrorLog();
+            toast({ title: 'Error log cleared' });
+          }}
+        >
+          Clear error log
+        </button>
+      </div>
     </div>
   );
 }

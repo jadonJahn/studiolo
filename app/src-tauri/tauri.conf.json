@@ -51,5 +51,16 @@
       "icons/icon.ico"
     ],
     "shortDescription": "Focus timer with generative art"
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDVDMjZERDg3NjY5REFDMjEKUldRaHJKMW1oOTBtWEJPbnhzS2QrNWRHL0FmYW1uRjZyUlVxdVhwK1BDcVpQOHU2VWRyZ3VoTVAK",
+      "endpoints": [
+        "https://github.com/jadonJahn/studiolo/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
   }
 }

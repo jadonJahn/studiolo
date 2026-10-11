@@ -10,7 +10,7 @@ function notify(title: string, body: string) {
   if (!s.notifications || typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
   if (!document.hidden) return;
   try {
-    new Notification(title, { body, icon: '/icon.svg', silent: true });
+    new Notification(title, { body, icon: `${import.meta.env.BASE_URL}icon.svg`, silent: true });
   } catch {
     /* some platforms only allow notifications from a service worker */
   }

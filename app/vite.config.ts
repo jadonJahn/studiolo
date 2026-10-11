@@ -1,13 +1,18 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
-import tauriConf from './src-tauri/tauri.conf.json';
+import tauriConf from './src-tauri/tauri.conf.json' with { type: 'json' };
 
 // The app's display name has one source: productName in the Tauri config.
 const APP_NAME: string = tauriConf.productName;
 
 export default defineConfig({
-  define: { 'import.meta.env.VITE_APP_NAME': JSON.stringify(APP_NAME) },
+  // Hosting under a subpath (GitHub Pages serves /<repo>/) sets BASE_PATH at build time.
+  base: process.env.BASE_PATH ?? '/',
+  define: {
+    'import.meta.env.VITE_APP_NAME': JSON.stringify(APP_NAME),
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(tauriConf.version),
+  },
   plugins: [
     react(),
     { name: 'app-name', transformIndexHtml: (html) => html.replaceAll('%APP_NAME%', APP_NAME) },

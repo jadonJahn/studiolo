@@ -5,6 +5,8 @@
 export interface Extensions {
   /** Start the local data API by default instead of leaving it off. */
   localApiDefault?: boolean;
+  /** Set to false for builds that aren't shipped through the public releases, so they never self-update. */
+  updates?: boolean;
   /** Show copy-ready commands and URLs for sharing the API over a tailnet. */
   tailnet?: { host: string; port: number; note: string };
 }
