@@ -1,6 +1,6 @@
-# Studiolo
+# Studiolo: developer guide
 
-A focus timer that paints a unique generative artwork while you work.
+How to run, build and find your way around the code. For what the app does and how to install it, see the [main README](../README.md).
 
 ## Run
 
