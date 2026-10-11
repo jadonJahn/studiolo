@@ -1,0 +1,34 @@
+[package]
+name = "studiolo"
+version = "0.1.0"
+description = "Focus timer with generative art"
+authors = ["Jadon Jahnke"]
+license = ""
+repository = ""
+edition = "2024"
+rust-version = "1.90"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "studiolo_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.7.2", features = [] }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+
+tauri = { version = "2.12.3", features = ["tray-icon"] }
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+tiny_http = "0.12.0"
+chrono = { version = "0.4.45", default-features = false, features = ["clock"] }
+
+# Music capture (WASAPI) and now-playing (media transport controls).
+[target.'cfg(windows)'.dependencies]
+rustfft = "6.4.1"
+base64 = "0.23.1"
+wasapi = "0.25.0"
+windows = { version = "0.62.2", features = ["Media_Control", "Foundation", "Foundation_Collections", "Storage_Streams", "Win32_Media_Audio", "Win32_System_Com", "Win32_System_Threading", "Win32_Foundation", "Win32_System_ProcessStatus", "Win32_System_Diagnostics_ToolHelp", "Win32_Media"] }
