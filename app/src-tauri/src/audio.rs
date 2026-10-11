@@ -380,6 +380,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "needs a real audio output device; run with `cargo test -- --ignored`"]
     fn live_system_capture_produces_frames() {
         let current = AtomicU64::new(1);
         let mut frames = 0;
