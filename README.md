@@ -125,7 +125,7 @@ npm run dev          # web app at http://localhost:5178
 npm run tauri dev    # desktop app
 ```
 
-See [app/README.md](app/README.md) for how the code is laid out (including how to add an art style) and [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+See [app/README.md](app/README.md) for how the code is laid out (including how to add an art style) and [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. Using an AI coding agent? Point it at [AGENTS.md](AGENTS.md).
 
 **Built with** [Tauri 2](https://tauri.app) and Rust (desktop shell, audio capture, SQLite), [React](https://react.dev) and TypeScript (UI), and Canvas 2D / WebGL2 shaders (art).
 

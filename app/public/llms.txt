@@ -1,0 +1,26 @@
+# Studiolo
+
+> Studiolo is a free, open-source (MIT) focus timer that paints a one-of-a-kind generative artwork while you work. It runs as a web app (installable PWA, works offline) and as a Windows desktop app built with Tauri. There is no account and no tracking; all data stays on the user's device.
+
+Key facts:
+- Timer modes: Pomodoro (focus, short and long breaks), countdown, stopwatch. Tasks with estimates, activities with colors, stats, streaks and achievements.
+- Seven art styles (Flow Field, Harmonograph, Nebula, Topography, Aurora, Stained Glass, Visualizer). Each session is seeded; the piece completes as the session does and is saved to a local gallery.
+- Desktop extras (Windows): a floating always-on-top mini timer, music-reactive art from system audio, now playing, tray mode, in-app updates, and an optional read-only local data API on 127.0.0.1:47800.
+- In Chrome and Edge, the web app can pop out the mini timer using Picture-in-Picture.
+
+## Use it
+
+- [Web app](https://jadonjahn.github.io/studiolo/): runs in any modern browser
+- [Windows installer](https://github.com/jadonJahn/studiolo/releases/latest): `Studiolo_<version>_x64-setup.exe`; unsigned, so SmartScreen asks once ("More info → Run anyway")
+
+## Docs
+
+- [README](https://github.com/jadonJahn/studiolo/blob/main/README.md): features, install, keyboard shortcuts, FAQ
+- [AGENTS.md](https://github.com/jadonJahn/studiolo/blob/main/AGENTS.md): architecture, commands, conventions for coding agents
+- [Developer guide](https://github.com/jadonJahn/studiolo/blob/main/app/README.md): code layout, adding art styles
+- [Changelog](https://github.com/jadonJahn/studiolo/blob/main/CHANGELOG.md)
+
+## Optional
+
+- [Source code](https://github.com/jadonJahn/studiolo)
+- [Report a bug](https://github.com/jadonJahn/studiolo/issues/new/choose)
