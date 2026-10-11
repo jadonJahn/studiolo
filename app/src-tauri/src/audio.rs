@@ -373,6 +373,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "needs a real audio output device; run with `cargo test -- --ignored`"]
     fn lists_sources() {
         let list = sources().expect("enumerate sessions");
         eprintln!("sources: {:?}", list.iter().map(|s| (&s.name, &s.exe, s.peak)).collect::<Vec<_>>());

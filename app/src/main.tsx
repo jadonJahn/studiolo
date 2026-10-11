@@ -6,8 +6,12 @@ import { timerTick } from './hooks';
 import { initDesktop, isDesktop } from './lib/desktop';
 import { isWidgetWindow } from './lib/env';
 import { initMusic } from './lib/music';
+import { initErrorLog } from './lib/diagnostics';
+import { checkForUpdateSoon } from './lib/updates';
 import { initWidgetHost } from './lib/widget';
 import './styles.css';
+
+initErrorLog();
 
 if (isWidgetWindow) {
   // The floating widget only mirrors state pushed from the main window.
@@ -15,6 +19,7 @@ if (isWidgetWindow) {
   await initDesktop(timerTick);
   await initMusic();
   await initWidgetHost();
+  checkForUpdateSoon();
 } else {
   // Installable PWA only in the browser; the desktop shell ships its own assets.
   const { registerSW } = await import('virtual:pwa-register');

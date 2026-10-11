@@ -4,11 +4,12 @@ import { APP_NAME } from './brand';
 import { ART_STYLES } from './art/engine';
 import { FocusView } from './components/FocusView';
 import { Gallery } from './components/Gallery';
-import { IconChart, IconGallery, IconSettings, IconTasks, IconTimer } from './components/icons';
+import { IconChart, IconDownload, IconGallery, IconSettings, IconTasks, IconTimer } from './components/icons';
 import { Settings } from './components/Settings';
 import { Stats } from './components/Stats';
 import { Tasks } from './components/Tasks';
 import { TimerHome } from './components/TimerHome';
+import { Welcome } from './components/Welcome';
 import { useAchievements, useAmbient, useTimerDriver } from './hooks';
 import { finishSegment, startTimer } from './lib/actions';
 import { useStore, useUI } from './store';
@@ -28,6 +29,8 @@ export default function App() {
   const focus = useUI((s) => s.focus);
   const setFocus = useUI((s) => s.setFocus);
   const toasts = useUI((s) => s.toasts);
+  const update = useUI((s) => s.update);
+  const [installing, setInstalling] = useState(false);
   const dismiss = useUI((s) => s.dismiss);
   const accent = useStore((s) => s.activities.find((a) => a.id === s.timer.activityId)?.color ?? '#8b83ff');
 
@@ -49,6 +52,7 @@ export default function App() {
     const onKey = (e: KeyboardEvent) => {
       const el = e.target instanceof Element ? e.target : null;
       if (el?.closest('input, textarea, select, [contenteditable]') || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (!useStore.getState().settings.welcomed) return;
       const st = useStore.getState();
       const t = st.timer;
       switch (e.key) {
@@ -97,7 +101,7 @@ export default function App() {
         <div className="shell">
           <nav className="nav">
             <div className="brand">
-              <img src="/icon.svg" alt="" width={28} height={28} />
+              <img src={`${import.meta.env.BASE_URL}icon.svg`} alt="" width={28} height={28} />
               <span>{APP_NAME}</span>
             </div>
             <ul>
@@ -110,6 +114,24 @@ export default function App() {
                 </li>
               ))}
             </ul>
+            {update && (
+              <div className="nav-update">
+                <button
+                  disabled={installing}
+                  onClick={() => {
+                    setInstalling(true);
+                    update.install().catch((e) => {
+                      setInstalling(false);
+                      useUI.getState().toast({ icon: '⚠️', title: 'Update failed', body: String(e) });
+                    });
+                  }}
+                  title={update.notes || `Install version ${update.version} and restart`}
+                >
+                  <IconDownload />
+                  <span>{installing ? 'Updating…' : `Update to ${update.version}`}</span>
+                </button>
+              </div>
+            )}
           </nav>
           <main className="main">
             {view === 'timer' && <TimerHome />}
@@ -127,6 +149,7 @@ export default function App() {
           </main>
         </div>
       )}
+      <Welcome />
       <div className="toasts" aria-live="polite">
         {toasts.map((t) => (
           <button key={t.id} className="toast glass" onClick={() => dismiss(t.id)}>

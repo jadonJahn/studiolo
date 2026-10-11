@@ -3,11 +3,12 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { ART_STYLES } from './art/engine';
 import { ext } from './extensions';
 import { isWidgetWindow } from './lib/env';
+import type { Update } from './lib/updates';
 import { elapsedMs, MIN, targetMs } from './lib/time';
 import type { Activity, ArtStyleId, Mode, Phase, Session, Settings, Task, TimerState } from './types';
 
 /** Fill in settings added since a save was made, carrying over renamed ones. */
-function migrateSettings(saved: Partial<Settings> & { zenClock?: boolean } = {}): Settings {
+export function migrateSettings(saved: Partial<Settings> & { zenClock?: boolean } = {}): Settings {
   const { zenClock, ...rest } = saved;
   return { ...DEFAULT_SETTINGS, ...(zenClock && !saved.focusClock ? { focusClock: 'auto' as const } : {}), ...rest };
 }
@@ -52,6 +53,8 @@ export const DEFAULT_SETTINGS: Settings = {
   widget: 'card',
   widgetClock: true,
   localApi: ext.localApiDefault ?? false,
+  welcomed: false,
+  closeToTray: false,
 };
 
 export const DEFAULT_ACTIVITIES: Activity[] = [
@@ -270,7 +273,7 @@ export const useStore = create<State>()(
         unlock: (ids) => set((st) => ({ unlocked: [...new Set([...st.unlocked, ...ids])] })),
         importData: (d) =>
           set(() => ({
-            settings: migrateSettings(d.settings),
+            settings: { ...migrateSettings(d.settings), welcomed: true },
             activities: d.activities?.length ? d.activities : DEFAULT_ACTIVITIES,
             tasks: d.tasks ?? [],
             sessions: d.sessions ?? [],
@@ -364,7 +367,10 @@ export const useStore = create<State>()(
       // Settings added in later versions need their defaults when loading older saves.
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<State>;
-        return { ...current, ...p, settings: migrateSettings(p.settings) };
+        const settings = migrateSettings(p.settings);
+        // People with history predate the welcome screen; don't greet them as new.
+        if (p.sessions?.length) settings.welcomed = true;
+        return { ...current, ...p, settings };
       },
     },
   ),
@@ -388,10 +394,15 @@ interface UIState {
   setFocus(v: boolean): void;
   toast(t: Omit<Toast, 'id'>): void;
   dismiss(id: string): void;
+  /** A newer release is ready to install (desktop). */
+  update: Update | null;
+  setUpdate(u: Update | null): void;
 }
 
 export const useUI = create<UIState>()((set, get) => ({
   focus: false,
+  update: null,
+  setUpdate: (u) => set({ update: u }),
   artPaused: false,
   setArtPaused: (v) => set({ artPaused: v }),
   toasts: [],
